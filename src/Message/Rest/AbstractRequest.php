@@ -1,14 +1,12 @@
 <?php
 /**
- *
- *
  * @author    王锶奇 <wangsiqi2@100tal.com>
+ *
  * @time      2019/12/17 4:59 下午
  *
  * @copyright 2019 好未来教育科技集团-考满分事业部
  * @license   http://www.kmf.com license
  */
-
 
 namespace Omnipay\PaypalV2\Message\Rest;
 
@@ -33,10 +31,31 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->referrerCode;
     }
 
+    public function getClientId()
+    {
+        return $this->getParameter('clientId');
+    }
+
+    public function setClientId($value)
+    {
+        return $this->setParameter('clientId', $value);
+    }
+
+    public function getSecret()
+    {
+        return $this->getParameter('secret');
+    }
+
+    public function setSecret($value)
+    {
+        return $this->setParameter('secret', $value);
+    }
+
     public function getToken()
     {
         return $this->getParameter('token');
     }
+
     public function setToken($value)
     {
         return $this->setParameter('token', $value);
@@ -51,7 +70,6 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     {
         return $this->getParameter('brandName');
     }
-
 
     /**
      * Get HTTP Method.
@@ -68,8 +86,9 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     /**
      * 发起请求
      *
-     * @param mixed $data
+     * @param  mixed  $data
      * @return ResponseInterface
+     *
      * @throws InvalidResponseException
      */
     public function sendData($data)
@@ -83,22 +102,23 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
             $httpResponse = $this->httpClient->request(
                 $this->getHttpMethod(),
                 $this->getEndpoint(),
-                array (
-                    'Accept'                        => 'application/json',
-                    'Authorization'                 => 'Basic ' . $this->getToken(),
-                    'Content-type'                  => 'application/json',
+                [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '.$this->getToken(),
+                    'Content-type' => 'application/json',
                     'PayPal-Partner-Attribution-Id' => $this->getReferrerCode(),
-                    'prefer'                        =>'return=representation'
-                ),
+                    'prefer' => 'return=representation',
+                ],
                 $body
             );
             // Empty response body should be parsed also as and empty array
-            $body                = (string)$httpResponse->getBody()->getContents();
-            $jsonToArrayResponse = !empty($body) ? json_decode($body, true) : array ();
+            $body = (string) $httpResponse->getBody()->getContents();
+            $jsonToArrayResponse = ! empty($body) ? json_decode($body, true) : [];
+
             return $this->response = $this->createResponse($jsonToArrayResponse, $httpResponse->getStatusCode());
         } catch (\Exception $e) {
             throw new InvalidResponseException(
-                'Error communicating with payment gateway: ' . $e->getMessage(),
+                'Error communicating with payment gateway: '.$e->getMessage(),
                 $e->getCode()
             );
         }
@@ -107,12 +127,12 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     protected function getEndpoint()
     {
         $base = $this->getTestMode() ? $this->testEndpoint : $this->liveEndpoint;
-        return $base . self::API_VERSION;
+
+        return $base.self::API_VERSION;
     }
 
     protected function createResponse($data, $statusCode)
     {
         return $this->response = new RestResponse($this, $data, $statusCode);
     }
-
 }
