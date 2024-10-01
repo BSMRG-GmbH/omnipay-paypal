@@ -18,8 +18,10 @@ use Omnipay\Common\Message\ResponseInterface;
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
     const API_VERSION = 'v2';
-    protected $liveEndpoint = 'https://api.paypal.com/';
-    protected $testEndpoint = 'https://api.sandbox.paypal.com/';
+
+    protected $liveEndpoint = 'https://api-m.paypal.com/';
+
+    protected $testEndpoint = 'https://api-m.sandbox.paypal.com/';
 
     protected $referrerCode;
 
