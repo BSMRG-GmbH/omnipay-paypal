@@ -21,6 +21,8 @@ use Omnipay\PaypalV2\Message\Rest\FetchTransactionRequest;
 use Omnipay\PaypalV2\Message\Rest\PurchaseRequest;
 use Omnipay\PaypalV2\Message\Rest\RefundRequest;
 use Omnipay\PaypalV2\Message\Rest\RestTokenRequest;
+use Omnipay\PaypalV2\TokenStorage\DefaultTokenStorageAdapter;
+use Omnipay\PaypalV2\TokenStorage\TokenStorageInterface;
 
 /**
  * @method RequestInterface authorize(array $options = array ())
@@ -35,7 +37,8 @@ class RestGateway extends AbstractGateway
 {
     protected TokenStorageInterface $tokenStorageAdapter;
 
-    public function initialize(array $parameters = array(), TokenStorageInterface $tokenStorageAdapter = new DefaultTokenStorageAdpater): self {
+    public function initialize(array $parameters = [], TokenStorageInterface $tokenStorageAdapter = new DefaultTokenStorageAdapter): self
+    {
         $this->tokenStorageAdapter = $tokenStorageAdapter;
 
         return parent::initialize($parameters);

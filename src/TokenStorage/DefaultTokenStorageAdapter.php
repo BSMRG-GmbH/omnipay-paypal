@@ -1,9 +1,11 @@
 <?php
 
-namespace Omnipay\PaypalV2;
+namespace Omnipay\PaypalV2\TokenStorage;
 
-class DefaultTokenStorageAdpater implements TokenStorageInterface {
+class DefaultTokenStorageAdapter implements TokenStorageInterface
+{
     protected string $token = '';
+
     protected int $ttl = 0;
 
     public function getAccessToken(): string
