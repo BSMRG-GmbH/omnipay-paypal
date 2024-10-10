@@ -11,7 +11,6 @@
 namespace Omnipay\PaypalV2;
 
 use Exception;
-use Illuminate\Support\Facades\Cache;
 use Omnipay\Common\AbstractGateway;
 use Omnipay\Common\Message\RequestInterface;
 use Omnipay\PaypalV2\Message\Rest\AbstractRequest;
@@ -34,17 +33,21 @@ use Omnipay\PaypalV2\Message\Rest\RestTokenRequest;
  */
 class RestGateway extends AbstractGateway
 {
-    public const PAYPAL_REST_TOKEN_CACHE_KEY = 'PAYPAL_REST_TOKEN';
+    protected TokenStorageInterface $tokenStorageAdapter;
 
-    public const PAYPAL_REST_TOKEN_EXPIRES_CACHE_KEY = 'PAYPAL_REST_TOKEN_EXPIRES';
+    public function initialize(array $parameters = array(), TokenStorageInterface $tokenStorageAdapter = new DefaultTokenStorageAdpater): self {
+        $this->tokenStorageAdapter = $tokenStorageAdapter;
+
+        return parent::initialize($parameters);
+    }
 
     public function getDefaultParameters()
     {
         return [
             'clientId' => '',
             'secret' => '',
-            'token' => Cache::get(self::PAYPAL_REST_TOKEN_CACHE_KEY, ''),
-            'tokenExpires' => Cache::get(self::PAYPAL_REST_TOKEN_EXPIRES_CACHE_KEY, ''),
+            'token' => $this->tokenStorageAdapter->getAccessToken(),
+            'tokenExpires' => $this->tokenStorageAdapter->getAccessTokenTTL(),
             'testMode' => false,
         ];
     }
@@ -170,7 +173,7 @@ class RestGateway extends AbstractGateway
      */
     public function setToken($value)
     {
-        Cache::set(self::PAYPAL_REST_TOKEN_CACHE_KEY, $value);
+        $this->tokenStorageAdapter->storeAccessToken($value);
 
         return $this->setParameter('token', $value);
     }
@@ -193,7 +196,7 @@ class RestGateway extends AbstractGateway
      */
     public function setTokenExpires($value)
     {
-        Cache::set(self::PAYPAL_REST_TOKEN_EXPIRES_CACHE_KEY, $value);
+        $this->tokenStorageAdapter->storeAccessTokenTTL($value);
 
         return $this->setParameter('tokenExpires', $value);
     }
